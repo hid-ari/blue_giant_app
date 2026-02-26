@@ -329,18 +329,25 @@ class AcercaScreen extends StatelessWidget {
 
 class EnMiVidaScreen extends StatefulWidget {
   const EnMiVidaScreen({super.key});
+
   @override
   State<EnMiVidaScreen> createState() => _EnMiVidaScreenState();
 }
 
 class _EnMiVidaScreenState extends State<EnMiVidaScreen> {
   late VideoPlayerController controller;
+  bool isReady = false;
 
   @override
   void initState() {
     super.initState();
-    controller = VideoPlayerController.asset("assets/videos/hideki_video.mp4")
-      ..initialize().then((_) => setState(() {}));
+    controller =
+        VideoPlayerController.asset("assets/videos/hideki_video.mp4")
+          ..initialize().then((_) {
+            setState(() {
+              isReady = true;
+            });
+          });
   }
 
   @override
@@ -354,22 +361,36 @@ class _EnMiVidaScreenState extends State<EnMiVidaScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text("En mi vida"), centerTitle: true),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("Hideki 20241453"),
-            const SizedBox(height: 20),
-            if (controller.value.isInitialized)
-              AspectRatio(
-                aspectRatio: controller.value.aspectRatio,
-                child: VideoPlayer(controller),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                "Hideki 20241453",
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () => controller.play(),
-              child: const Text("Reproducir Video"),
-            ),
-          ],
+              const SizedBox(height: 20),
+
+              if (isReady)
+                AspectRatio(
+                  aspectRatio: controller.value.aspectRatio,
+                  child: VideoPlayer(controller),
+                )
+              else
+                const CircularProgressIndicator(),
+
+              const SizedBox(height: 20),
+
+              ElevatedButton(
+                onPressed: () {
+                  if (isReady) {
+                    controller.play();
+                  }
+                },
+                child: const Text("Reproducir Video"),
+              ),
+            ],
+          ),
         ),
       ),
     );
